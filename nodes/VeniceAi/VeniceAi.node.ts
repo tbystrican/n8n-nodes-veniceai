@@ -3,7 +3,7 @@ import { NodeOperationError } from 'n8n-workflow';
 
 export class VeniceAi implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Venice AI',
+    displayName: 'Venice.ai',
     name: 'veniceAi',
     icon: 'file:veniceai.svg',
     group: ['transform'],
@@ -11,7 +11,7 @@ export class VeniceAi implements INodeType {
     subtitle: '={{$parameter["operation"]}}',
     description: 'Interact with Venice AI API',
     defaults: {
-      name: 'Venice AI',
+      name: 'Venice.ai',
     },
     inputs: '={{["main"]}}',
     outputs: '={{["main"]}}',
@@ -47,7 +47,7 @@ export class VeniceAi implements INodeType {
         },
         required: true,
         default: '',
-        description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+        description: 'Choose from the list.',
       },
       {
         displayName: 'Message',
