@@ -1,44 +1,48 @@
 # n8n-nodes-veniceai
 
-This is an n8n community node for Venice.ai API integration. It allows you to interact with various AI models through the Venice.ai platform directly from your n8n workflows.
+This is an n8n community node. It lets you use Venice.ai API in your n8n workflows.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[Venice.ai](https://venice.ai) provides a private and uncensored AI API with features like document uploads, image generation, and customizable interactions, available in both free and paid Venice Pro versions.
 
-## Prerequisites
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-You need the following installed on your development machine:
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)  <!-- delete if no auth needed -->  
+[Compatibility](#compatibility)  
+[Resources](#resources)  
+[Version history](#version-history)  <!-- delete if not using this section -->  
 
-* [git](https://git-scm.com/downloads)
-* Node.js and pnpm. Minimum version Node 18. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  pnpm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+## Installation
 
-## Using this starter
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+## Operations
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `pnpm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `pnpm lint` to check for errors or `pnpm lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+### Chat Completions
+Endpoint: /api/v1/chat/completions
 
-## More information
+Documentation: [Chat Completions API Reference](https://docs.venice.ai/api-reference/endpoint/chat/completions)
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+Purpose: Generate text responses in a chat-like format
 
-## License
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+## Credentials
+
+Venice’s API is protected via API keys. To generate a key, you must be a [Venice Pro User](https://venice.ai/pricing).
+
+
+## Compatibility
+
+Tested on n8n Version 1.71.3
+
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
+* [Venice.ai API reference](https://docs.venice.ai/api-reference/api-spec)
+
+## Version history
+
+_This is another optional section. If your node has multiple versions, include a short description of available versions and what changed, as well as any compatibility impact._
+
+
