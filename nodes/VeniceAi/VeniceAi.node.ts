@@ -63,7 +63,7 @@ export class VeniceAi implements INodeType {
         },
         required: true,
         default: '',
-        description: 'Choose from the list.',
+        description: 'Choose from the list. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
       },
       {
         displayName: 'Message',

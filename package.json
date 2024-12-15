@@ -1,19 +1,19 @@
 {
     "name": "n8n-nodes-veniceai",
     "version": "0.1.0",
-    "description": "",
+    "description": "Venice.ai provides a private and uncensored AI API with features like document uploads, image generation, and customizable interactions, available in both free and paid Venice Pro versions.",
     "keywords": [
         "n8n-community-node-package"
     ],
     "license": "MIT",
-    "homepage": "",
+    "homepage": "https://github.com/tbystrican/n8n-nodes-veniceai",
     "author": {
-        "name": "",
-        "email": ""
+        "name": "Tomas Bystrican",
+        "email": "tomas@micrologic.sk"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/tbystrican/n8n-nodes-veniceai.git"
+        "url": "git+https://github.com/tbystrican/n8n-nodes-veniceai.git"
     },
     "engines": {
         "node": ">=18.10",
