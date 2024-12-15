@@ -20,11 +20,11 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 ## Operations
 
 ### Chat Completions
-Endpoint: /api/v1/chat/completions
+Only Chat Completions operation is currently supported.
 
-Documentation: [Chat Completions API Reference](https://docs.venice.ai/api-reference/endpoint/chat/completions)
-
-Purpose: Generate text responses in a chat-like format
+- Endpoint: /api/v1/chat/completions
+- Documentation: [Chat Completions API Reference](https://docs.venice.ai/api-reference/endpoint/chat/completions)
+- Purpose: Generate text responses in a chat-like format
 
 
 ## Credentials
