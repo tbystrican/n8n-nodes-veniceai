@@ -220,7 +220,7 @@ export class VeniceAi implements INodeType {
         const messageContent = response.choices[0].message.content.trim();
         returnData.push({ 
           json: { 
-            response: messageContent, 
+            output: messageContent, 
           }, 
           pairedItem: { item: i }, 
         }); 
