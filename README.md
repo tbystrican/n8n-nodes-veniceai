@@ -11,7 +11,7 @@ This is an n8n community node. It lets you use Venice.ai API in your n8n workflo
 [Credentials](#credentials)  <!-- delete if no auth needed -->  
 [Compatibility](#compatibility)  
 [Resources](#resources)  
-[Version history](#version-history)  <!-- delete if not using this section -->  
+ 
 
 ## Installation
 
@@ -20,11 +20,17 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 ## Operations
 
 ### Chat Completions
-Only Chat Completions operation is currently supported.
 
 - Endpoint: /api/v1/chat/completions
 - Documentation: [Chat Completions API Reference](https://docs.venice.ai/api-reference/endpoint/chat/completions)
 - Purpose: Generate text responses in a chat-like format
+
+### Images Generate
+
+- Endpoint: /api/v1/images/generate
+- Documentation: [Images Generate API Reference](https://docs.venice.ai/api-reference/endpoint/image/generate)
+- Purpose: Generate images
+
 
 
 ## Credentials
@@ -41,7 +47,5 @@ Tested on n8n Version 1.71.3
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
 * [Venice.ai API reference](https://docs.venice.ai/api-reference/api-spec)
 
-## Version history
-- V1.0 - first public version
 
 
