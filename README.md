@@ -42,7 +42,6 @@ Tested on n8n Version 1.71.3
 * [Venice.ai API reference](https://docs.venice.ai/api-reference/api-spec)
 
 ## Version history
-
-_This is another optional section. If your node has multiple versions, include a short description of available versions and what changed, as well as any compatibility impact._
+- V1.0 - first public version
 
 
