@@ -1,14 +1,4 @@
-import type {
-  IExecuteFunctions,
-  ILoadOptionsFunctions,
-  INodeExecutionData,
-  INodeType,
-  INodeTypeDescription,
-  IDataObject,
-  INodePropertyOptions,
-  IHttpRequestMethods,
-  IRequestOptions,
-} from 'n8n-workflow';
+import type { IExecuteFunctions, ILoadOptionsFunctions, INodeExecutionData, INodeType, INodeTypeDescription, IDataObject, INodePropertyOptions, IHttpRequestMethods, IRequestOptions, } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
 export class VeniceAi implements INodeType {
@@ -23,8 +13,8 @@ export class VeniceAi implements INodeType {
     defaults: {
       name: 'Venice.ai',
     },
-    inputs: '={{["main"]}}',
-    outputs: '={{["main"]}}',
+    inputs: ['main'], // Corrected to an array
+    outputs: ['main'], // Corrected to an array
     credentials: [
       {
         name: 'veniceAiApi',
@@ -209,13 +199,6 @@ export class VeniceAi implements INodeType {
             default: false,
             description: 'Whether to hide the watermark',
           },
-          /*{
-            displayName: 'Return Binary',
-            name: 'return_binary',
-            type: 'boolean',
-            default: false,
-            description: 'Whether to return the image as binary',
-          }, */
           {
             displayName: 'Seed',
             name: 'seed',
@@ -244,6 +227,7 @@ export class VeniceAi implements INodeType {
             default: '',
             description: 'Negative prompt to use for generating the image',
           },
+
         ],
       },
     ],
@@ -253,6 +237,8 @@ export class VeniceAi implements INodeType {
     loadOptions: {
       async getModels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
         const credentials = await this.getCredentials('veniceAiApi');
+        const operation = this.getCurrentNodeParameter('operation') as string;
+
         const options: IRequestOptions = {
           url: 'https://api.venice.ai/api/v1/models',
           headers: {
@@ -261,6 +247,7 @@ export class VeniceAi implements INodeType {
           method: 'GET' as IHttpRequestMethods,
           json: true,
         };
+
         try {
           const response = await this.helpers.request(options);
           if (!response?.data || !Array.isArray(response.data)) {
@@ -269,7 +256,8 @@ export class VeniceAi implements INodeType {
               'Invalid response format from Venice AI API',
             );
           }
-          const models = response.data
+
+          let models = response.data
             .filter((model: any) => model.id && model.object === 'model')
             .map((model: any) => ({
               name: model.id,
@@ -277,12 +265,20 @@ export class VeniceAi implements INodeType {
               description: model.type,
             }))
             .sort((a: INodePropertyOptions, b: INodePropertyOptions) => a.name.localeCompare(b.name));
+
+          if (operation === 'chat') {
+            models = models.filter((model: INodePropertyOptions) => model.description?.includes('text'));
+          } else if (operation === 'images') {
+            models = models.filter((model: INodePropertyOptions) => model.description?.includes('image'));
+          }
+
           if (models.length === 0) {
             throw new NodeOperationError(
               this.getNode(),
               'No models found in Venice AI API response',
             );
           }
+
           return models;
         } catch (error) {
           throw new NodeOperationError(
@@ -298,30 +294,31 @@ export class VeniceAi implements INodeType {
     const items = this.getInputData();
     const returnData: INodeExecutionData[] = [];
     const credentials = await this.getCredentials('veniceAiApi');
+
     if (!credentials?.apiKey) {
       throw new NodeOperationError(this.getNode(), 'No valid API key provided');
     }
+
     for (let i = 0; i < items.length; i++) {
       try {
         const operation = this.getNodeParameter('operation', i) as string;
         const model = this.getNodeParameter('model', i) as string;
+
         if (operation === 'chat') {
           const message = this.getNodeParameter('message', i) as string;
           const temperature = this.getNodeParameter('temperature', i) as number;
           const chatOptions = this.getNodeParameter('chatOptions', i) as IDataObject;
+
           const messages = [];
+
           // Add system message if provided
           if (chatOptions.system_prompt) {
-            messages.push({
-              role: 'system',
-              content: chatOptions.system_prompt,
-            });
+            messages.push({ role: 'system', content: chatOptions.system_prompt });
           }
+
           // Add user message
-          messages.push({
-            role: 'user',
-            content: message,
-          });
+          messages.push({ role: 'user', content: message });
+
           const options: IRequestOptions = {
             url: 'https://api.venice.ai/api/v1/chat/completions',
             headers: {
@@ -340,8 +337,10 @@ export class VeniceAi implements INodeType {
             },
             json: true,
           };
+
           const response = await this.helpers.request(options);
           this.logger.debug('Response from API:', response);
+
           if (!response?.choices?.[0]?.message?.content) {
             this.logger.error('Invalid response format from Venice AI API');
             throw new NodeOperationError(
@@ -349,8 +348,10 @@ export class VeniceAi implements INodeType {
               'Invalid response format from Venice AI API',
             );
           }
+
           const messageContent = response.choices[0].message.content.trim();
           this.logger.debug('Message content:', messageContent);
+
           returnData.push({
             json: {
               output: messageContent,
@@ -362,6 +363,7 @@ export class VeniceAi implements INodeType {
         } else if (operation === 'images') {
           const prompt = this.getNodeParameter('prompt', i) as string;
           const imageOptions = this.getNodeParameter('imageOptions', i) as IDataObject;
+
           const options: IRequestOptions = {
             url: 'https://api.venice.ai/api/v1/image/generate',
             headers: {
@@ -376,7 +378,6 @@ export class VeniceAi implements INodeType {
               height: imageOptions.height,
               steps: imageOptions.steps,
               hide_watermark: imageOptions.hide_watermark,
-              //return_binary: imageOptions.return_binary,
               seed: imageOptions.seed,
               cfg_scale: imageOptions.cfg_scale,
               style_preset: imageOptions.style_preset,
@@ -384,8 +385,10 @@ export class VeniceAi implements INodeType {
             },
             json: true,
           };
+
           const response = await this.helpers.request(options);
           this.logger.debug('Response from API:', response);
+
           if (!response?.images || !Array.isArray(response.images)) {
             this.logger.error('Invalid response format from Venice AI API');
             throw new NodeOperationError(
@@ -394,7 +397,7 @@ export class VeniceAi implements INodeType {
             );
           }
 
-					returnData.push({
+          returnData.push({
             json: {
               response,
             },
@@ -402,23 +405,6 @@ export class VeniceAi implements INodeType {
               item: i,
             },
           });
-
-
-					/*
-					const imageData = response.images[0];
-          this.logger.debug('Image data:', imageData);
-          returnData.push({
-            json: {
-              output: imageData,
-            },
-            pairedItem: {
-              item: i,
-            },
-          });
-					*/
-
-
-
         }
       } catch (error) {
         if (this.continueOnFail()) {
@@ -435,6 +421,7 @@ export class VeniceAi implements INodeType {
         throw error;
       }
     }
+
     return [returnData];
   }
 }

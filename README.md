@@ -11,6 +11,7 @@ This is an n8n community node. It lets you use Venice.ai API in your n8n workflo
 [Credentials](#credentials)  <!-- delete if no auth needed -->  
 [Compatibility](#compatibility)  
 [Resources](#resources)  
+[Changelog](#changelog)  
  
 
 ## Installation
@@ -47,5 +48,12 @@ Tested on n8n Version 1.71.3
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
 * [Venice.ai API reference](https://docs.venice.ai/api-reference/api-spec)
 
+## Changelog
 
+### v1.1
+- first public version
 
+### v1.2
+- new credentials node with API key verification
+- venice logo icon added to credentials node
+- added model filtering to only show text models for Chat and image models for images
