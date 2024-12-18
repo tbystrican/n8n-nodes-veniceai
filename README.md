@@ -57,3 +57,6 @@ Tested on n8n Version 1.71.3
 - new credentials node with API key verification
 - venice logo icon added to credentials node
 - added model filtering to only show text models for Chat and image models for images
+
+### v1.3
+- Return Binary image option added

@@ -8,7 +8,7 @@ import {
 
 export class veniceAiApi implements ICredentialType {
 	name = 'veniceAiApi';
-	displayName = 'VeniceAi';
+	displayName = 'VeniceAi API';
 	icon: Icon = 'file:veniceAiApi.png';
 
 	documentationUrl = 'https://docs.venice.ai/welcome/guides/generating-api-key';
