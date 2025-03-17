@@ -33,7 +33,7 @@ export class VeniceAi implements INodeType {
 					{
 						name: 'Chat',
 						value: 'chat',
-						description: 'Send a chat message',
+						description: 'Send a chat message (supports text and images)',
 						action: 'Send a chat message',
 					},
 					{
@@ -240,6 +240,31 @@ export class VeniceAi implements INodeType {
 
 				],
 			},
+			{
+				displayName: 'Binary Image',
+				name: 'binaryImage',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to include an image from binary input',
+				displayOptions: {
+					show: {
+						operation: ['chat'],
+					},
+				},
+			},
+			{
+				displayName: 'Binary Image Property',
+				name: 'binaryImageProperty',
+				type: 'string',
+				default: 'data',
+				description: 'Name of the binary property containing the image',
+				displayOptions: {
+					show: {
+						operation: ['chat'],
+						binaryImage: [true],
+					},
+				},
+			},
 		],
 	};
 
@@ -318,16 +343,35 @@ export class VeniceAi implements INodeType {
 					const message = this.getNodeParameter('message', i) as string;
 					const temperature = this.getNodeParameter('temperature', i) as number;
 					const chatOptions = this.getNodeParameter('chatOptions', i) as IDataObject;
+					const binaryImage = this.getNodeParameter('binaryImage', i, false) as boolean;
 
 					const messages = [];
+					const content = [];
 
 					// Add system message if provided
 					if (chatOptions.system_prompt) {
 						messages.push({ role: 'system', content: chatOptions.system_prompt });
 					}
 
-					// Add user message
-					messages.push({ role: 'user', content: message });
+					// Add text content
+					content.push({ type: 'text', text: message });
+
+					// Add image if provided
+					if (binaryImage) {
+						const binaryImageProperty = this.getNodeParameter('binaryImageProperty', i) as string;
+						const binaryData = this.helpers.assertBinaryData(i, binaryImageProperty);
+						const base64Image = binaryData.data;
+
+						content.push({
+							type: 'image_url',
+							image_url: {
+								url: `data:${binaryData.mimeType};base64,${base64Image}`,
+							},
+						});
+					}
+
+					// Add user message with content array
+					messages.push({ role: 'user', content });
 
 					const options: IRequestOptions = {
 						url: 'https://api.venice.ai/api/v1/chat/completions',
@@ -512,7 +556,7 @@ export class VeniceAi implements INodeType {
 				[
 					{
 						message:
-							'To split the contents of ‘data’ into separate items for easier processing, add a ‘Spilt Out’ node after this one',
+							"To split the contents of 'data' into separate items for easier processing, add a 'Split Out' node after this one",
 						location: 'outputPane',
 					},
 				],
