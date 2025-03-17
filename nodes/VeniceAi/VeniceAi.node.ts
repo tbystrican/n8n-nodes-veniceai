@@ -125,6 +125,30 @@ export class VeniceAi implements INodeType {
 						placeholder: 'You are a helpful assistant...',
 					},
 					{
+						displayName: 'Web Search',
+						name: 'enable_web_search',
+						type: 'options',
+						options: [
+							{
+								name: 'Auto',
+								value: 'auto',
+								description: 'Let the model decide when to use web search',
+							},
+							{
+								name: 'On',
+								value: 'on',
+								description: 'Force web search on',
+							},
+							{
+								name: 'Off',
+								value: 'off',
+								description: 'Force web search off',
+							},
+						],
+						default: 'auto',
+						description: 'Control whether the model uses web search',
+					},
+					{
 						displayName: 'Frequency Penalty',
 						name: 'frequency_penalty',
 						type: 'number',
@@ -386,8 +410,9 @@ export class VeniceAi implements INodeType {
 							temperature,
 							venice_parameters: {
 								include_venice_system_prompt: (chatOptions as any)['include_venice_system_prompt'] ?? false,
+								enable_web_search: (chatOptions as any)['enable_web_search'] ?? 'auto',
 							},
-							...Object.fromEntries(Object.entries(chatOptions).filter(([key]) => !['system_prompt', 'include_venice_system_prompt'].includes(key))),
+							...Object.fromEntries(Object.entries(chatOptions).filter(([key]) => !['system_prompt', 'include_venice_system_prompt', 'enable_web_search'].includes(key))),
 						},
 						json: true,
 					};
