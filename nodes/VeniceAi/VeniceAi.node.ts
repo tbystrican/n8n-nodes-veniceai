@@ -261,7 +261,34 @@ export class VeniceAi implements INodeType {
 						default: false,
 						description: 'Whether to return binary image data instead of base64',
 					},
-
+					{
+						displayName: 'Lora Strength',
+						name: 'lora_strength',
+						type: 'number',
+						default: 0.5,
+						description: 'Strength of the LoRA model',
+					},
+					{
+						displayName: 'Safe Mode',
+						name: 'safe_mode',
+						type: 'boolean',
+						default: false,
+						description: 'Whether to use safe mode',
+					},
+					{
+						displayName: 'Format',
+						name: 'format',
+						type: 'string',
+						default: 'png',
+						description: 'Format of the generated image (webp, png, jpg)',
+					},
+					{
+						displayName: 'Embed EXIF Metadata',
+						name: 'embed_exif_metadata',
+						type: 'boolean',
+						default: false,
+						description: 'Whether to embed EXIF metadata in the generated image',
+					},
 				],
 			},
 			{
@@ -298,14 +325,22 @@ export class VeniceAi implements INodeType {
 				const credentials = await this.getCredentials('veniceAiApi');
 				const operation = this.getCurrentNodeParameter('operation') as string;
 
-				const options: IRequestOptions = {
-					url: 'https://api.venice.ai/api/v1/models',
+				var options: IRequestOptions = {
+					url: 'https://api.venice.ai/api/v1/models?type=all',
 					headers: {
 						Authorization: `Bearer ${credentials.apiKey}`,
 					},
 					method: 'GET' as IHttpRequestMethods,
 					json: true,
 				};
+
+				if (operation === 'chat') {
+
+				} else if (operation === 'images') {
+
+				}
+
+
 
 				try {
 					const response = await this.helpers.request(options);
@@ -466,7 +501,11 @@ export class VeniceAi implements INodeType {
 								cfg_scale: imageOptions.cfg_scale,
 								style_preset: imageOptions.style_preset,
 								negative_prompt: imageOptions.negative_prompt,
-								return_binary: imageOptions.return_binary
+								return_binary: imageOptions.return_binary,
+								lora_strength: imageOptions.lora_strength,
+								safe_mode: imageOptions.safe_mode,
+								format: imageOptions.format,
+								embed_exif_metadata: imageOptions.embed_exif_metadata
 							},
 							json: false, // Set json to false to get the response as a buffer
 							encoding: null, // Set encoding to null to get the response as a buffer
@@ -491,7 +530,11 @@ export class VeniceAi implements INodeType {
 								cfg_scale: imageOptions.cfg_scale,
 								style_preset: imageOptions.style_preset,
 								negative_prompt: imageOptions.negative_prompt,
-								return_binary: imageOptions.return_binary
+								return_binary: imageOptions.return_binary,
+								lora_strength: imageOptions.lora_strength,
+								safe_mode: imageOptions.safe_mode,
+								format: imageOptions.format,
+								embed_exif_metadata: imageOptions.embed_exif_metadata
 							},
 							json: true, // Set json to false to get the response as a buffer
 						};
