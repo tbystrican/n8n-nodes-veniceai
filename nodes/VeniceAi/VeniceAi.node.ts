@@ -541,7 +541,7 @@ export class VeniceAi implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const operation = this.getNodeParameter('operation', i) as string;
-				const model = this.getNodeParameter('model', i) as string;
+				const model = operation !== 'speech' ? this.getNodeParameter('model', i) as string : '';
 
 				if (operation === 'chat') {
 					const message = this.getNodeParameter('message', i) as string;
