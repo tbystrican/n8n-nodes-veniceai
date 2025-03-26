@@ -2,17 +2,17 @@
 
 This is an n8n community node. It lets you use Venice.ai API in your n8n workflows.
 
-[Venice.ai](https://venice.ai) provides a private and uncensored AI API with features like document uploads, image generation, vision models, web search, and customizable interactions, available in both free and paid Venice Pro versions.
+[Venice.ai](https://venice.ai) Venice API enables you to harness the power of advanced AI models for text and image generation while maintaining the highest standards of privacy and performance.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-[Installation](#installation)  
-[Operations](#operations)  
-[Credentials](#credentials)  <!-- delete if no auth needed -->  
-[Compatibility](#compatibility)  
-[Resources](#resources)  
-[Changelog](#changelog)  
- 
+### Venice's Values
+
+- **Privacy-First Architecture**: Built from the ground up with user privacy as a core principle. Venice does not utilize or store user data for any purposes whatsoever.
+- **Open-Source**: Venice only utilizes open-source models to ensure users have full transparency into the models they are interacting with.
+- **OpenAI API Compatible**: Seamless integration with existing OpenAI clients using the Venice API base URL.
+
+
 
 ## Installation
 
@@ -42,6 +42,18 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
   - Control over generation steps and parameters
   - Style presets and negative prompts
   - Binary or base64 image output
+
+### Speech Generation
+
+- Endpoint: /api/v1/audio/speech
+- Documentation: [Speech API Reference](https://docs.venice.ai/api-reference/endpoint/audio/speech)
+- Purpose: Convert text to speech
+- Features:
+  - Multiple voice options (male and female voices)
+  - Adjustable speech speed (0.25x to 4.0x)
+  - Multiple audio formats (MP3, Opus, AAC, FLAC, WAV, PCM)
+  - Streaming support for sentence-by-sentence output
+  - Maximum text length of 4096 characters
 
 ## Vision Models
 
@@ -106,3 +118,10 @@ Tested on n8n Version 1.71.3
 - Added web search capability with Auto/On/Off options
 - Enhanced chat options with web search controls
 - Updated documentation with web search examples
+
+### v1.6
+- Added Text to Speech functionality
+- Multiple voice options with gender selection
+- Adjustable speech speed and format options
+- Streaming support for sentence-by-sentence output
+- Binary audio output support

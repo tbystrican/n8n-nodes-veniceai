@@ -42,6 +42,12 @@ export class VeniceAi implements INodeType {
 						description: 'Generate an image',
 						action: 'Generate an image',
 					},
+					{
+						name: 'Speech',
+						value: 'speech',
+						description: 'Convert text to speech',
+						action: 'Generate speech from text',
+					},
 				],
 				default: 'chat',
 			},
@@ -56,6 +62,11 @@ export class VeniceAi implements INodeType {
 				required: true,
 				default: '',
 				description: 'Choose from the list. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+				displayOptions: {
+					show: {
+						operation: ['chat', 'images'],
+					},
+				},
 			},
 			{
 				displayName: 'Message',
@@ -313,6 +324,138 @@ export class VeniceAi implements INodeType {
 					show: {
 						operation: ['chat'],
 						binaryImage: [true],
+					},
+				},
+			},
+			{
+				displayName: 'Text',
+				name: 'text',
+				type: 'string',
+				typeOptions: {
+					rows: 4,
+				},
+				default: '',
+				description: 'The text to convert to speech (max 4096 characters)',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['speech'],
+					},
+				},
+			},
+			{
+				displayName: 'Voice',
+				name: 'voice',
+				type: 'options',
+				options: [
+					{ name: 'Alloy (Female)', value: 'af_alloy' },
+					{ name: 'Aoede (Female)', value: 'af_aoede' },
+					{ name: 'Bella (Female)', value: 'af_bella' },
+					{ name: 'Heart (Female)', value: 'af_heart' },
+					{ name: 'Jadzia (Female)', value: 'af_jadzia' },
+					{ name: 'Jessica (Female)', value: 'af_jessica' },
+					{ name: 'Kore (Female)', value: 'af_kore' },
+					{ name: 'Nicole (Female)', value: 'af_nicole' },
+					{ name: 'Nova (Female)', value: 'af_nova' },
+					{ name: 'River (Female)', value: 'af_river' },
+					{ name: 'Sarah (Female)', value: 'af_sarah' },
+					{ name: 'Sky (Female)', value: 'af_sky' },
+					{ name: 'Adam (Male)', value: 'am_adam' },
+					{ name: 'Echo (Male)', value: 'am_echo' },
+					{ name: 'Eric (Male)', value: 'am_eric' },
+					{ name: 'Fenrir (Male)', value: 'am_fenrir' },
+					{ name: 'Liam (Male)', value: 'am_liam' },
+					{ name: 'Michael (Male)', value: 'am_michael' },
+					{ name: 'Onyx (Male)', value: 'am_onyx' },
+					{ name: 'Puck (Male)', value: 'am_puck' },
+					{ name: 'Santa (Male)', value: 'am_santa' },
+					{ name: 'Alice (Female)', value: 'bf_alice' },
+					{ name: 'Emma (Female)', value: 'bf_emma' },
+					{ name: 'Lily (Female)', value: 'bf_lily' },
+					{ name: 'Daniel (Male)', value: 'bm_daniel' },
+					{ name: 'Fable (Male)', value: 'bm_fable' },
+					{ name: 'George (Male)', value: 'bm_george' },
+					{ name: 'Lewis (Male)', value: 'bm_lewis' },
+					{ name: 'Dora (Female)', value: 'ef_dora' },
+					{ name: 'Alex (Male)', value: 'em_alex' },
+					{ name: 'Santa (Male)', value: 'em_santa' },
+					{ name: 'Siwis (Female)', value: 'ff_siwis' },
+					{ name: 'Alpha (Female)', value: 'hf_alpha' },
+					{ name: 'Beta (Female)', value: 'hf_beta' },
+					{ name: 'Omega (Male)', value: 'hm_omega' },
+					{ name: 'Psi (Male)', value: 'hm_psi' },
+					{ name: 'Sara (Female)', value: 'if_sara' },
+					{ name: 'Nicola (Male)', value: 'im_nicola' },
+					{ name: 'Alpha (Female)', value: 'jf_alpha' },
+					{ name: 'Gongitsune (Female)', value: 'jf_gongitsune' },
+					{ name: 'Nezumi (Female)', value: 'jf_nezumi' },
+					{ name: 'Tebukuro (Female)', value: 'jf_tebukuro' },
+					{ name: 'Kumo (Male)', value: 'jm_kumo' },
+					{ name: 'Dora (Female)', value: 'pf_dora' },
+					{ name: 'Alex (Male)', value: 'pm_alex' },
+					{ name: 'Santa (Male)', value: 'pm_santa' },
+					{ name: 'Xiaobei (Female)', value: 'zf_xiaobei' },
+					{ name: 'Xiaoni (Female)', value: 'zf_xiaoni' },
+					{ name: 'Xiaoxiao (Female)', value: 'zf_xiaoxiao' },
+					{ name: 'Xiaoyi (Female)', value: 'zf_xiaoyi' },
+					{ name: 'Yunjian (Male)', value: 'zm_yunjian' },
+					{ name: 'Yunxi (Male)', value: 'zm_yunxi' },
+					{ name: 'Yunxia (Male)', value: 'zm_yunxia' },
+					{ name: 'Yunyang (Male)', value: 'zm_yunyang' },
+				],
+				default: 'af_sky',
+				description: 'The voice to use for speech generation',
+				displayOptions: {
+					show: {
+						operation: ['speech'],
+					},
+				},
+			},
+			{
+				displayName: 'Response Format',
+				name: 'responseFormat',
+				type: 'options',
+				options: [
+					{ name: 'MP3', value: 'mp3' },
+					{ name: 'Opus', value: 'opus' },
+					{ name: 'AAC', value: 'aac' },
+					{ name: 'FLAC', value: 'flac' },
+					{ name: 'WAV', value: 'wav' },
+					{ name: 'PCM', value: 'pcm' },
+				],
+				default: 'mp3',
+				description: 'The format of the audio response',
+				displayOptions: {
+					show: {
+						operation: ['speech'],
+					},
+				},
+			},
+			{
+				displayName: 'Speed',
+				name: 'speed',
+				type: 'number',
+				default: 1,
+				description: 'The speed of the generated audio (0.25 to 4.0)',
+				typeOptions: {
+					minValue: 0.25,
+					maxValue: 4,
+				},
+				displayOptions: {
+					show: {
+						operation: ['speech'],
+					},
+				},
+			},
+			{
+				displayName: 'Streaming',
+				name: 'streaming',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to stream the audio back sentence by sentence',
+				displayOptions: {
+					show: {
+						operation: ['speech'],
 					},
 				},
 			},
@@ -588,6 +731,63 @@ export class VeniceAi implements INodeType {
 						});
 					}
 
+				} else if (operation === 'speech') {
+					const text = this.getNodeParameter('text', i) as string;
+					const voice = this.getNodeParameter('voice', i) as string;
+					const responseFormat = this.getNodeParameter('responseFormat', i) as string;
+					const speed = this.getNodeParameter('speed', i) as number;
+					const streaming = this.getNodeParameter('streaming', i) as boolean;
+
+					const options: IRequestOptions = {
+						url: 'https://api.venice.ai/api/v1/audio/speech',
+						headers: {
+							Authorization: `Bearer ${credentials.apiKey}`,
+							'Content-Type': 'application/json',
+						},
+						method: 'POST' as IHttpRequestMethods,
+						body: {
+							model: 'tts-kokoro',
+							input: text,
+							voice,
+							response_format: responseFormat,
+							speed,
+							streaming,
+						},
+						json: false,
+						encoding: null,
+					};
+
+					const response = await this.helpers.request(options);
+					this.logger.debug('Response from API:', response);
+
+					const outputPropertyName = this.getNodeParameter(
+						'options.response.response.outputPropertyName',
+						0,
+						'data',
+					) as string;
+
+					const newItem: INodeExecutionData = {
+						json: {},
+						binary: {},
+						pairedItem: {
+							item: i,
+						},
+					};
+
+					Object.assign(newItem.binary as IBinaryKeyData, items[i].binary);
+					const responseContentType = `audio/${responseFormat}`;
+
+					newItem.json = items[i].json;
+					const binaryData = response;
+
+					const preparedBinaryData = await this.helpers.prepareBinaryData(
+						binaryData,
+						undefined,
+						responseContentType || undefined,
+					);
+					preparedBinaryData.fileName = `speech.${responseFormat}`;
+					newItem.binary![outputPropertyName] = preparedBinaryData;
+					returnData.push(newItem);
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
