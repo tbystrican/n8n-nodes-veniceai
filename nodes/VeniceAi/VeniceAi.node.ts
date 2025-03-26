@@ -1,3 +1,5 @@
+/* eslint-disable n8n-nodes-base/node-param-option-name-duplicate */
+/* eslint-disable n8n-nodes-base/node-param-options-type-unsorted-items */
 import type { IExecuteFunctions, ILoadOptionsFunctions, INodeExecutionData, INodeType, INodeTypeDescription, IDataObject, INodePropertyOptions, IHttpRequestMethods, IRequestOptions, IBinaryKeyData, } from 'n8n-workflow';
 import { NodeOperationError, NodeExecutionOutput } from 'n8n-workflow';
 import { Readable } from 'stream';
