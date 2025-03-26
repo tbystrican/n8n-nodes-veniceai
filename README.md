@@ -119,7 +119,7 @@ Tested on n8n Version 1.71.3
 - Enhanced chat options with web search controls
 - Updated documentation with web search examples
 
-### v1.6
+### v1.6.1
 - Added Text to Speech functionality
 - Multiple voice options with gender selection
 - Adjustable speech speed and format options
