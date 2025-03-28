@@ -82,6 +82,24 @@ Example use cases:
 - Fact-checking and verification
 - Research and data gathering
 
+## Session-Based Memory
+
+The Venice AI node supports conversation memory through the sessionId parameter:
+
+- Maintain context across multiple node executions
+- Group related conversations with unique session IDs
+- Memory context is included in API calls automatically
+- Perfect for building multi-turn conversational workflows
+
+## Tools Integration
+
+The node supports tool selection for AI model function calling:
+
+- Select specific tools through multi-select options
+- AI can use selected tools during conversation
+- Tools are included in API calls to the Venice API
+- Enables more interactive and capable AI assistants
+
 ## Credentials
 
 Venice's API is protected via API keys. To generate a key, you must be a [Venice Pro User](https://venice.ai/pricing).
@@ -125,3 +143,36 @@ Tested on n8n Version 1.71.3
 - Adjustable speech speed and format options
 - Streaming support for sentence-by-sentence output
 - Binary audio output support
+
+### v1.7
+- Added tools integration via multi-select options
+- Implemented session-based memory through sessionId parameter
+- Enhanced model selection refresh when switching between operations
+- Improved model filtering based on operation type
+- Added debug logging for troubleshooting
+- Better error handling for model loading
+
+
+
+## Upcoming Features
+
+The following features are planned for future releases:
+
+### Chat Enhancements
+- Tool Calls support for function calling
+- Streaming support for chat completions
+- Reasoning content exposure
+- Advanced parameters (min_p, stop_token_ids)
+
+### Image Capabilities
+- Image upscaling operation
+- Inpainting support
+- EXIF metadata embedding
+- Format selection options
+
+### Multi-Modal Support
+- Enhanced image and text mixed inputs
+- Improved session management
+- Better validation for image inputs
+
+See our [refactoring plan](./refactor.md) for more details on upcoming features.
