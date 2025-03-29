@@ -329,8 +329,7 @@ export class VeniceAi implements INodeType {
 						type: 'options',
 						options: [
 							{ name: 'PNG', value: 'png' },
-							{ name: 'WEBP', value: 'webp' },
-							{ name: 'JPEG', value: 'jpeg' },
+							{ name: 'WEBP', value: 'webp' }
 						],
 						default: 'png',
 						description: 'The format of the generated image.',
@@ -503,12 +502,12 @@ export class VeniceAi implements INodeType {
 							},
 							{
 								name: 'Always',
-								value: 'true',
+								value: 'on',
 								description: 'Always search the web to answer user queries.',
 							},
 							{
 								name: 'Never',
-								value: 'false',
+								value: 'off',
 								description: 'Never search the web to answer user queries.',
 							},
 						],

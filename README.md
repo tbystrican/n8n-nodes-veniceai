@@ -115,24 +115,24 @@ Tested on n8n Version 1.71.3
 
 ## Changelog
 
-### v1.1
+### v1.1.0
 - First public version
 
-### v1.2
+### v1.2.0
 - New credentials node with API key verification
 - Venice logo icon added to credentials node
 - Added model filtering to only show text models for Chat and image models for images
 
-### v1.3
+### v1.3.0
 - Return Binary image option added
 
-### v1.4
+### v1.4.0
 - Added support for vision-enabled models
 - New Binary Image input option for image analysis
 - Updated model filtering to include vision models
 - Improved error handling and logging
 
-### v1.5
+### v1.5.0
 - Added web search capability with Auto/On/Off options
 - Enhanced chat options with web search controls
 - Updated documentation with web search examples
@@ -144,13 +144,16 @@ Tested on n8n Version 1.71.3
 - Streaming support for sentence-by-sentence output
 - Binary audio output support
 
-### v1.7
+### v1.7.0
 - Added tools integration via multi-select options
 - Implemented session-based memory through sessionId parameter
 - Enhanced model selection refresh when switching between operations
 - Improved model filtering based on operation type
 - Added debug logging for troubleshooting
 - Better error handling for model loading
+
+### v1.7.1
+- Fixed issue with web search and image format API parameters
 
 
 
