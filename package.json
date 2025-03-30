@@ -1,6 +1,6 @@
 {
     "name": "n8n-nodes-veniceai",
-    "version": "1.7.1",
+    "version": "1.7.2",
     "description": "Venice.ai provides a private and uncensored AI API with features like document uploads, image generation, and customizable interactions, available in both free and paid Venice Pro versions.",
     "keywords": [
         "n8n-community-node-package"

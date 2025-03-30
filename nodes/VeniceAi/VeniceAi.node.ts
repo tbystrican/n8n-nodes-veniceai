@@ -275,25 +275,6 @@ export class VeniceAi implements INodeType {
 				},
 			},
 			{
-				displayName: 'Image Size',
-				name: 'size',
-				type: 'options',
-				options: [
-					{ name: '256x256', value: '256x256' },
-					{ name: '512x512', value: '512x512' },
-					{ name: '1024x1024', value: '1024x1024' },
-					{ name: '1024x1792', value: '1024x1792' },
-					{ name: '1792x1024', value: '1792x1024' },
-				],
-				default: '1024x1024',
-				description: 'The size of the generated image.',
-				displayOptions: {
-					show: {
-						operation: ['images'],
-					},
-				},
-			},
-			{
 				displayName: 'Image Options',
 				name: 'imageOptions',
 				type: 'collection',
@@ -381,17 +362,6 @@ export class VeniceAi implements INodeType {
 						description: 'Option to return binary image data instead of base64',
 					},
 					{
-						displayName: 'Response Format',
-						name: 'response_format',
-						type: 'options',
-						options: [
-							{ name: 'URL', value: 'url' },
-							{ name: 'Base64 JSON', value: 'b64_json' },
-						],
-						default: 'url',
-						description: 'The format in which the generated images are returned.',
-					},
-					{
 						displayName: 'Safe Mode',
 						name: 'safe_mode',
 						type: 'boolean',
@@ -453,6 +423,69 @@ export class VeniceAi implements INodeType {
 						default: 1024,
 						description: 'The width of the generated image. Requires values divisible by the model-specific divisor.',
 					},
+					{
+						displayName: 'Sampler',
+						name: 'sampler',
+						type: 'string',
+						default: 'euler_a',
+						description: 'Sampling method to use',
+					},
+					{
+						displayName: 'Inpaint',
+						name: 'inpaint',
+						type: 'collection',
+						placeholder: 'Add Inpaint Option',
+						default: {},
+						options: [
+							{
+								displayName: 'Strength',
+								name: 'strength',
+								type: 'number',
+								default: 0.75,
+								description: 'Strength of the inpainting effect',
+							},
+							{
+								displayName: 'Source Image',
+								name: 'source_image_base64',
+								type: 'string',
+								default: '',
+								description: 'Base64 encoded source image to inpaint (data:image/png;base64,...)',
+							},
+							{
+								displayName: 'Mask Options',
+								name: 'mask',
+								type: 'collection',
+								placeholder: 'Add Mask Option',
+								default: {},
+								options: [
+									{
+										displayName: 'Image Prompt',
+										name: 'image_prompt',
+										type: 'string',
+										typeOptions: {
+											rows: 4,
+										},
+										default: '',
+										description: 'A text prompt describing the original input image for inpainting',
+									},
+									{
+										displayName: 'Object Target',
+										name: 'object_target',
+										type: 'string',
+										default: '',
+										description: 'Elements in the original image to inpaint over',
+									},
+									{
+										displayName: 'Inferred Object',
+										name: 'inferred_object',
+										type: 'string',
+										default: '',
+										description: 'The content to add to the image via inpainting, replacing object_target',
+									},
+								],
+							},
+						],
+					},
 				],
 			},
 			{
@@ -487,7 +520,7 @@ export class VeniceAi implements INodeType {
 							rows: 4,
 						},
 						default: '',
-						description: 'System message to set the behavior of the assistant',
+						description: 'System message to set the behavior of the assistant.',
 						placeholder: 'You are a helpful assistant...',
 					},
 					{
@@ -550,6 +583,13 @@ export class VeniceAi implements INodeType {
 						type: 'boolean',
 						default: false,
 						description: 'Option to include the Venice default system prompt',
+					},
+					{
+						displayName: 'Disable Tools',
+						name: 'disable_tools',
+						type: 'boolean',
+						default: false,
+						description: 'Disable tools for this request. Required for some models that don\'t support tools, such as when using binary images.',
 					},
 				],
 			},
@@ -998,19 +1038,31 @@ export class VeniceAi implements INodeType {
 					if (binaryImage) {
 						// Handle binary image
 						const binaryImageProperty = this.getNodeParameter('binaryImageProperty', i) as string;
-						// Use assertBinaryData instead of getBinaryDataBuffer
-						const binaryData = this.helpers.assertBinaryData(i, binaryImageProperty);
 
-						this.logger.debug('Sending message with binary data');
-						const contentItem = {
-							type: 'image',
-							data: binaryData.data,  // Base64 string
-						};
+						const binaryData = this.helpers.assertBinaryData(i, binaryImageProperty);
+						const base64Image = binaryData.data;  // data should already be base64
+						const imageUrl = `data:${binaryData.mimeType};base64,${base64Image}`;
+
+						// Get the text message if available
+						const textMessage = message || "What is in this image?";
 
 						messages.push({
 							role: 'user',
-							content: [contentItem],
+							content: [
+								{
+									type: 'text',
+									text: textMessage
+								},
+								{
+									type: 'image_url',
+									image_url: {
+										url: imageUrl
+									}
+								}
+							]
 						});
+
+						this.logger.debug('Sending message with binary data and text');
 					} else {
 						// Add plain text message
 						messages.push({
@@ -1052,13 +1104,16 @@ export class VeniceAi implements INodeType {
 							venice_parameters: {
 								include_venice_system_prompt: chatOptions.include_venice_system_prompt || false,
 								enable_web_search: chatOptions.enable_web_search || 'auto',
-							},
-							tools: [],
-							tool_choice: 'auto',
+							}
 						};
 
-						// Add tools to the request if connected
-						if (toolsConnected && tools.length > 0) {
+						// Only add tools if they're not disabled and we're not using binary images
+						const disableTools = binaryImage || chatOptions.disable_tools;
+
+						if (!disableTools && toolsConnected && tools.length > 0) {
+							// Add tools array and tool_choice ONLY if tools are being used
+							requestOptions.body.tools = [];
+
 							// Format tools for Venice AI - using each tool's exact schema
 							const formattedTools = tools.map(tool => {
 								// Get the tool's schema directly from the tool
@@ -1113,10 +1168,10 @@ export class VeniceAi implements INodeType {
 							// Debug the exact tools being sent to the API
 							this.logger.debug('Added tools to request with exact schemas:', formattedTools);
 
-							// Set tool_choice based on chat options
-							if (chatOptions.tool_choice) {
-								requestOptions.body.tool_choice = chatOptions.tool_choice;
-							}
+							// // Set tool_choice based on chat options
+							// if (chatOptions.tool_choice) {
+							// 	requestOptions.body.tool_choice = chatOptions.tool_choice;
+							// }
 
 							this.logger.debug('Added tools to request with exact schemas:', formattedTools);
 						}
@@ -1236,7 +1291,7 @@ export class VeniceAi implements INodeType {
 										});
 
 										// Parse and transform arguments
-										const transformedArgs = await processToolArguments(tool, args, name, this.logger);
+										const transformedArgs = await VeniceAi.processToolArguments(tool, args, name, this.logger);
 										this.logger.debug(`Processed args for ${name}:`, {
 											before: args,
 											after: transformedArgs
@@ -1550,8 +1605,6 @@ export class VeniceAi implements INodeType {
 					const prompt = this.getNodeParameter('prompt', i) as string;
 					const imageOptions = this.getNodeParameter('imageOptions', i) as IDataObject;
 
-					//let jsonResponse = true as boolean;
-
 					let options: IRequestOptions;
 
 					if (imageOptions.return_binary) {
@@ -1577,10 +1630,30 @@ export class VeniceAi implements INodeType {
 								safe_mode: imageOptions.safe_mode,
 								format: imageOptions.format,
 								embed_exif_metadata: imageOptions.embed_exif_metadata,
+								sampler: imageOptions.sampler,
 							},
 							json: false, // Set json to false to get the response as a buffer
 							encoding: null, // Set encoding to null to get the response as a buffer
 						};
+
+						// Add inpaint parameters for binary option if they exist
+						if (imageOptions.inpaint && Object.keys(imageOptions.inpaint as IDataObject).length > 0) {
+							const inpaintOptions = imageOptions.inpaint as IDataObject;
+							(options.body as IDataObject).inpaint = {
+								strength: inpaintOptions.strength,
+								source_image_base64: inpaintOptions.source_image_base64,
+							};
+
+							// Add mask options if they exist
+							if (inpaintOptions.mask && Object.keys(inpaintOptions.mask as IDataObject).length > 0) {
+								const maskOptions = inpaintOptions.mask as IDataObject;
+								((options.body as IDataObject).inpaint as IDataObject).mask = {
+									image_prompt: maskOptions.image_prompt,
+									object_target: maskOptions.object_target,
+									inferred_object: maskOptions.inferred_object,
+								};
+							}
+						}
 					} else {
 						options = {
 							url: 'https://api.venice.ai/api/v1/image/generate',
@@ -1605,9 +1678,29 @@ export class VeniceAi implements INodeType {
 								safe_mode: imageOptions.safe_mode,
 								format: imageOptions.format,
 								embed_exif_metadata: imageOptions.embed_exif_metadata,
+								sampler: imageOptions.sampler,
 							},
-							json: true, // Set json to false to get the response as a buffer
+							json: true,
 						};
+
+						// Add inpaint parameters for non-binary option if they exist
+						if (imageOptions.inpaint && Object.keys(imageOptions.inpaint as IDataObject).length > 0) {
+							const inpaintOptions = imageOptions.inpaint as IDataObject;
+							(options.body as IDataObject).inpaint = {
+								strength: inpaintOptions.strength,
+								source_image_base64: inpaintOptions.source_image_base64,
+							};
+
+							// Add mask options if they exist
+							if (inpaintOptions.mask && Object.keys(inpaintOptions.mask as IDataObject).length > 0) {
+								const maskOptions = inpaintOptions.mask as IDataObject;
+								((options.body as IDataObject).inpaint as IDataObject).mask = {
+									image_prompt: maskOptions.image_prompt,
+									object_target: maskOptions.object_target,
+									inferred_object: maskOptions.inferred_object,
+								};
+							}
+						}
 					}
 
 					const response = await this.helpers.request(options);
@@ -1756,39 +1849,39 @@ export class VeniceAi implements INodeType {
 
 		return [returnData];
 	}
-}
 
-/**
- * Process tool arguments using the same approach as n8n's OpenAI implementation
- */
-async function processToolArguments(tool: any, args: any, name: string, logger: any): Promise<any> {
-	// Log the exact input format
-	logger.debug(`Tool ${name} raw args:`, {
-		args,
-		type: typeof args,
-		isString: typeof args === 'string'
-	});
+	/**
+	 * Process tool arguments using the same approach as n8n's OpenAI implementation
+	 */
+	static processToolArguments(tool: any, args: any, name: string, logger: any): Promise<any> {
+		// Log the exact input format
+		logger.debug(`Tool ${name} raw args:`, {
+			args,
+			type: typeof args,
+			isString: typeof args === 'string'
+		});
 
-	// Parse the args if they're a string (JSON)
-	if (typeof args === 'string') {
-		try {
-			// Parse exactly as n8n does in message.operation.ts
-			const parsedArgs = jsonParse(args) as any;
-			logger.debug(`Tool ${name} parsed JSON input:`, { parsedArgs });
+		// Parse the args if they're a string (JSON)
+		if (typeof args === 'string') {
+			try {
+				// Parse exactly as n8n does in message.operation.ts
+				const parsedArgs = jsonParse(args) as any;
+				logger.debug(`Tool ${name} parsed JSON input:`, { parsedArgs });
 
-			// Extract input exactly as n8n does: parsedArgs.input ?? parsedArgs
-			// This allows tools to receive either the raw "input" property value
-			// or the full object if no input property exists
-			const functionInput = parsedArgs.input ?? parsedArgs;
-			logger.debug(`Extracted function input for ${name}:`, { functionInput });
-			return functionInput;
-		} catch (e) {
-			// If parsing fails, return the string directly
-			logger.debug(`Failed to parse args string for ${name}, using as-is`);
-			return args;
+				// Extract input exactly as n8n does: parsedArgs.input ?? parsedArgs
+				// This allows tools to receive either the raw "input" property value
+				// or the full object if no input property exists
+				const functionInput = parsedArgs.input ?? parsedArgs;
+				logger.debug(`Extracted function input for ${name}:`, { functionInput });
+				return Promise.resolve(functionInput);
+			} catch (e) {
+				// If parsing fails, return the string directly
+				logger.debug(`Failed to parse args string for ${name}, using as-is`);
+				return Promise.resolve(args);
+			}
 		}
-	}
 
-	// Return the args as-is if they're not a string
-	return args;
+		// Return the args as-is if they're not a string
+		return Promise.resolve(args);
+	}
 }

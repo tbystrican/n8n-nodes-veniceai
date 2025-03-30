@@ -155,7 +155,11 @@ Tested on n8n Version 1.71.3
 ### v1.7.1
 - Fixed issue with web search and image format API parameters
 
-
+### v1.7.2
+- Fixed issue with binary image handling in chat operation
+- Added option to disable tools when using models that don't support them
+- Improved message structure for image analysis according to API requirements
+- Better error handling for incompatible model features
 
 ## Upcoming Features
 
