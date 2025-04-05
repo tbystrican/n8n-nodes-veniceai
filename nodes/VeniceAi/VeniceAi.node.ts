@@ -1654,6 +1654,9 @@ export class VeniceAi implements INodeType {
 								};
 							}
 						}
+						
+						// Debug log for image generation request body
+						this.logger.debug('Image generation request (binary):', options.body);
 					} else {
 						options = {
 							url: 'https://api.venice.ai/api/v1/image/generate',
@@ -1701,6 +1704,9 @@ export class VeniceAi implements INodeType {
 								};
 							}
 						}
+						
+						// Debug log for image generation request body
+						this.logger.debug('Image generation request (non-binary):', options.body);
 					}
 
 					const response = await this.helpers.request(options);
