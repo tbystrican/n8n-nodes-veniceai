@@ -115,7 +115,7 @@ Venice's API is protected via API keys. To generate a key, you must be a [Venice
 
 ## Compatibility
 
-Tested on n8n Version 1.71.3
+Tested on n8n Version 1.71.3+
 
 ## Resources
 
@@ -170,6 +170,9 @@ Tested on n8n Version 1.71.3
 - Improved message structure for image analysis according to API requirements
 - Better error handling for incompatible model features
 
+### v1.8.1
+- Added Upscale Images operation
+  
 ## Upcoming Features
 
 The following features are planned for future releases:
