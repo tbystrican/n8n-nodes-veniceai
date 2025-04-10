@@ -20,6 +20,15 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
+### Upscale Images
+- Endpoint: /api/v1/image/upscale
+- Documentation: [Image Upscale API Reference](https://docs.venice.ai/api-reference/endpoint/image/upscale)
+- Purpose: Increase image resolution while maintaining quality
+- Features:
+  - 2x or 4x upscaling options
+  - Handle images up to 4096x4096 pixels
+  - Batch processing support
+
 ### Chat Completions
 
 - Endpoint: /api/v1/chat/completions

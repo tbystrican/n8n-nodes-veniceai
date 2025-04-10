@@ -220,6 +220,12 @@ export class VeniceAi implements INodeType {
 						description: 'Convert text to speech',
 						action: 'Generate speech from text',
 					},
+					{
+						name: 'Upscale',
+						value: 'upscale',
+						description: 'Upscale images to higher resolution',
+						action: 'Upscale an image',
+					},
 				],
 				default: 'chat',
 			},
@@ -750,6 +756,57 @@ export class VeniceAi implements INodeType {
 					},
 				},
 			},
+			{
+				displayName: 'Binary Image',
+				name: 'binaryImageUpscale',
+				type: 'boolean',
+				default: true,
+				required: true,
+				description: 'Provide an image from binary data',
+				displayOptions: {
+					show: {
+						operation: ['upscale'],
+					},
+				},
+			},
+			{
+				displayName: 'Binary Image Property',
+				name: 'binaryImageUpscaleProperty',
+				type: 'string',
+				default: 'data',
+				description: 'Name of the binary property containing the image to upscale',
+				displayOptions: {
+					show: {
+						operation: ['upscale'],
+						binaryImageUpscale: [true],
+					},
+				},
+			},
+			{
+				displayName: 'Scale Factor',
+				name: 'scaleFactor',
+				type: 'options',
+				options: [
+					{
+						name: '2x Original Size',
+						value: 2,
+						description: 'Upscale to twice the original resolution',
+					},
+					{
+						name: '4x Original Size',
+						value: 4,
+						description: 'Upscale to four times the original resolution',
+					},
+				],
+				default: 4,
+				description: 'How much to upscale the image by',
+				displayOptions: {
+					show: {
+						operation: ['upscale'],
+					},
+				},
+			},
+
 		],
 	};
 
@@ -967,7 +1024,7 @@ export class VeniceAi implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const operation = this.getNodeParameter('operation', i) as string;
-				const model = operation !== 'speech' ? (this.getNodeParameter('model', i) as string) : '';
+				const model = (operation !== 'speech' && operation !== 'upscale') ? (this.getNodeParameter('model', i) as string) : '';
 
 				if (operation === 'chat') {
 					const message = this.getNodeParameter('message', i) as string;
@@ -1654,7 +1711,7 @@ export class VeniceAi implements INodeType {
 								};
 							}
 						}
-						
+
 						// Debug log for image generation request body
 						this.logger.debug('Image generation request (binary):', options.body);
 					} else {
@@ -1704,7 +1761,7 @@ export class VeniceAi implements INodeType {
 								};
 							}
 						}
-						
+
 						// Debug log for image generation request body
 						this.logger.debug('Image generation request (non-binary):', options.body);
 					}
@@ -1810,6 +1867,165 @@ export class VeniceAi implements INodeType {
 					preparedBinaryData.fileName = `speech.${responseFormat}`;
 					newItem.binary![outputPropertyName] = preparedBinaryData;
 					returnData.push(newItem);
+				} else if (operation === 'upscale') {
+					const binaryImageUpscale = this.getNodeParameter('binaryImageUpscale', i) as boolean;
+					const scaleFactor = this.getNodeParameter('scaleFactor', i) as number;
+
+
+					let binaryPropertyName: string;
+					let fileName: string = 'image';
+					let mimeType: string = 'application/octet-stream';
+					let formDataObj: IDataObject = {};
+
+					// Get the binary image data
+					if (binaryImageUpscale) {
+						binaryPropertyName = this.getNodeParameter('binaryImageUpscaleProperty', i) as string;
+
+						// Check if binary data exists with proper type assertions
+						if (!items[i].binary) {
+							throw new NodeOperationError(
+								this.getNode(),
+								'No binary data exists on item!',
+							);
+						}
+
+						// Use non-null assertion to tell TypeScript we've already checked for undefined
+						const binaryItem = items[i].binary!;
+
+						if (!binaryItem[binaryPropertyName]) {
+							throw new NodeOperationError(
+								this.getNode(),
+								`No binary data property '${binaryPropertyName}' exists on item!`,
+							);
+						}
+
+						const binaryData = binaryItem[binaryPropertyName];
+						const binaryDataBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
+						fileName = binaryData.fileName || 'image';
+						mimeType = binaryData.mimeType || 'application/octet-stream';
+
+						// Verify it's an image
+						if (!mimeType.includes('image/')) {
+							throw new NodeOperationError(
+								this.getNode(),
+								'The provided binary data is not an image!',
+							);
+						}
+
+						// Create form data with only scale and image parameters
+						const formDataObj: IDataObject = {};
+						formDataObj.image = binaryDataBuffer; // Send the binary buffer directly
+						formDataObj.scale = scaleFactor.toString();
+
+						// Debug log for upscale request
+						this.logger.debug('Upscale request formData:', {
+							scale: scaleFactor,
+							imageBufferLength: binaryDataBuffer.length
+						});
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							'Upscaling requires a binary image input',
+						);
+					}
+
+					// Get the binary data buffer
+					const binaryDataBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
+
+					// Use a simple multipart/form-data approach
+					const options: IRequestOptions = {
+						url: 'https://api.venice.ai/api/v1/image/upscale',
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${credentials.apiKey}`,
+						},
+						formData: {
+							scale: scaleFactor,
+							image: {
+								value: binaryDataBuffer,
+								options: {
+									filename: fileName,
+									contentType: mimeType,
+								},
+							},
+						},
+						encoding: null, // Important: This ensures the response is treated as binary
+						resolveWithFullResponse: true,
+					};
+
+					// Debug log for upscale API request options
+					this.logger.debug('Upscale API request options:', {
+						url: options.url,
+						method: options.method,
+						formDataKeys: Object.keys(formDataObj),
+						hasAuth: options.headers ? !!options.headers.Authorization : false,
+						encoding: options.encoding,
+						resolveWithFullResponse: options.resolveWithFullResponse
+					});
+
+					try {
+						// Make the request
+						const response = await this.helpers.request(options);
+
+						// Debug log for upscale API response
+						this.logger.debug('Upscale API response:', {
+							hasResponse: !!response,
+							hasBody: response && !!response.body,
+							hasHeaders: response && !!response.headers,
+							contentType: response?.headers?.['content-type'],
+							bodyLength: response?.body ? (response.body instanceof Buffer ? response.body.length : 'not a buffer') : 0
+						});
+
+						// Use non-null assertions to tell TypeScript we're confident these properties exist
+						const responseBody = response!.body || Buffer.from([]);
+						const responseHeaders = response!.headers || {};
+
+						// Get the mime type with a safe default
+						let responseMimeType = 'image/png'; // Default
+						if (responseHeaders['content-type']) {
+							responseMimeType = responseHeaders['content-type'];
+						}
+
+						// Determine output filename
+						let outputFileName = fileName;
+						responseMimeType = 'image/png';
+
+
+						// Save the binary data
+						const newItem: INodeExecutionData = {
+							json: {
+								success: true,
+								filename: outputFileName,
+								format: responseMimeType,
+								scale: scaleFactor,
+							},
+							binary: {
+								data: await this.helpers.prepareBinaryData(
+									responseBody,
+									outputFileName,
+									responseMimeType,
+								),
+							},
+							pairedItem: {
+								item: i,
+							},
+						};
+
+						returnData.push(newItem);
+					} catch (error) {
+						if (this.continueOnFail()) {
+							returnData.push({
+								json: {
+									error: error.message,
+								},
+								pairedItem: {
+									item: i,
+								},
+							});
+							continue;
+						}
+						throw error;
+					}
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {

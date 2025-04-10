@@ -83,11 +83,11 @@ This document outlines the step-by-step plan for enhancing the Venice AI node to
 - [ ] Add seed parameter for deterministic outputs
 
 ### 4.3. New Image Operations
-- [ ] Add new operation: "upscale" for image upscaling
-- [ ] Implement image upload for upscaling
-- [ ] Add scale parameter with options for 2x and 4x upscaling
-- [ ] Handle binary image output in node execution
-- [ ] Support both JPEG and PNG formats for upscaling
+- [x] Add new operation: "upscale" for image upscaling
+- [x] Implement image upload for upscaling
+- [x] Add scale parameter with options for 2x and 4x upscaling
+- [x] Handle binary image output in node execution
+- [x] Support both JPEG and PNG formats for upscaling
 
 ### 4.4. Multi-Modal Support
 - [ ] Add better support for image_url in messages
