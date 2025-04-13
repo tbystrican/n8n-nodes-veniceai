@@ -322,6 +322,17 @@ export class VeniceAi implements INodeType {
 						description: 'The format of the generated image.',
 					},
 					{
+						displayName: 'Width',
+						name: 'width',
+						type: 'number',
+						typeOptions: {
+							minValue: 1,
+							maxValue: 1280,
+						},
+						default: 1280,
+						description: 'The width of the generated image. Requires values divisible by the model-specific divisor.',
+					},
+					{
 						displayName: 'Height',
 						name: 'height',
 						type: 'number',
@@ -329,7 +340,7 @@ export class VeniceAi implements INodeType {
 							minValue: 1,
 							maxValue: 1280,
 						},
-						default: 1024,
+						default: 720,
 						description: 'The height of the generated image. Requires values divisible by the model-specific divisor.',
 					},
 					{
@@ -417,17 +428,6 @@ export class VeniceAi implements INodeType {
 						],
 						default: 'Photographic',
 						description: 'The style preset to use for image generation.',
-					},
-					{
-						displayName: 'Width',
-						name: 'width',
-						type: 'number',
-						typeOptions: {
-							minValue: 1,
-							maxValue: 1280,
-						},
-						default: 1024,
-						description: 'The width of the generated image. Requires values divisible by the model-specific divisor.',
 					},
 					{
 						displayName: 'Sampler',
