@@ -25,6 +25,14 @@ export class veniceAiApi implements ICredentialType {
 			required: true,
 			description: 'The VeniceAi API key',
 		},
+		{
+			displayName: 'Base URL',
+			name: 'baseUrl',
+			type: 'string',
+			default: 'https://api.venice.ai/api/v1',
+			required: false,
+			description: 'Custom API base URL. Defaults to https://api.venice.ai/api/v1',
+		},
 	];
 
 	authenticate: IAuthenticateGeneric = {
@@ -38,8 +46,11 @@ export class veniceAiApi implements ICredentialType {
 
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: "https://api.venice.ai",
-			url: "/api/v1/models",
+			baseURL: "={{$credentials.baseUrl || 'https://api.venice.ai/api/v1'}}",
+			url: "/models/compatibility_mapping",
+			headers: {
+				'Content-Type': 'application/json',
+			},
 		},
 	};
 

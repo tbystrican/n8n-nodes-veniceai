@@ -18,6 +18,19 @@ This is an n8n community node. It lets you use Venice.ai API in your n8n workflo
 
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
+## Configuration
+
+### API Key
+You'll need to provide your Venice.ai API key to use this node. You can get your API key from your [Venice.ai dashboard](https://venice.ai).
+
+### Base URL
+The node supports custom Base URL configuration, allowing you to:
+- Use different Venice.ai API environments
+- Connect to self-hosted instances
+- Configure proxy settings if needed
+
+By default, the Base URL is set to `https://api.venice.ai/api/v1`. You can modify this in the credentials settings if needed.
+
 ## Operations
 
 ### Upscale Images
@@ -172,7 +185,10 @@ Tested on n8n Version 1.71.3+
 
 ### v1.8.1
 - Added Upscale Images operation
-  
+
+### v1.9.0
+- Added Base URL to credentials to be able to use various endpoints (usefull for Venice betatesters)
+
 ## Upcoming Features
 
 The following features are planned for future releases:

@@ -819,7 +819,7 @@ export class VeniceAi implements INodeType {
 				this.logger.debug('Getting models for operation: ' + operation);
 
 				var options: IRequestOptions = {
-					url: 'https://api.venice.ai/api/v1/models?type=all',
+					url: `${credentials.baseUrl}/models?type=all`,
 					headers: {
 						Authorization: `Bearer ${credentials.apiKey}`,
 					},
@@ -1666,7 +1666,7 @@ export class VeniceAi implements INodeType {
 
 					if (imageOptions.return_binary) {
 						options = {
-							url: 'https://api.venice.ai/api/v1/image/generate',
+							url: `${credentials.baseUrl}/image/generate`,
 							headers: {
 								Authorization: `Bearer ${credentials.apiKey}`,
 							},
