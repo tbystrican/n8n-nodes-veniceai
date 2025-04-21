@@ -859,7 +859,6 @@ export class VeniceAi implements INodeType {
 				default: '',
 				description: 'Optional text prompt for upscaling',
 				placeholder: 'Enter prompt (optional)',
-				required: false,
 				displayOptions: {
 					show: {
 						operation: ['upscale'],
