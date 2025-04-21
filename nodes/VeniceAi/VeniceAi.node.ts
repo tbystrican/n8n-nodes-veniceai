@@ -806,6 +806,66 @@ export class VeniceAi implements INodeType {
 					},
 				},
 			},
+			{
+				displayName: 'Enhance',
+				name: 'enhance',
+				type: 'boolean',
+				default: false,
+				description: 'Enhance the upscaled image',
+				displayOptions: {
+					show: {
+						operation: ['upscale'],
+					},
+				},
+			},
+			{
+				displayName: 'Replication',
+				name: 'replication',
+				type: 'number',
+				default: 0.35,
+				description: 'Replication value (0-1)',
+				typeOptions: {
+					minValue: 0,
+					maxValue: 1,
+					step: 0.01,
+				},
+				displayOptions: {
+					show: {
+						operation: ['upscale'],
+					},
+				},
+			},
+			{
+				displayName: 'Enhance Creativity',
+				name: 'enhanceCreativity',
+				type: 'number',
+				default: 0.35,
+				description: 'Enhance creativity value (0-1)',
+				typeOptions: {
+					minValue: 0,
+					maxValue: 1,
+					step: 0.01,
+				},
+				displayOptions: {
+					show: {
+						operation: ['upscale'],
+					},
+				},
+			},
+			{
+				displayName: 'Prompt',
+				name: 'prompt',
+				type: 'string',
+				default: '',
+				description: 'Optional text prompt for upscaling',
+				placeholder: 'Enter prompt (optional)',
+				required: false,
+				displayOptions: {
+					show: {
+						operation: ['upscale'],
+					},
+				},
+			},
 
 		],
 	};
@@ -1870,7 +1930,10 @@ export class VeniceAi implements INodeType {
 				} else if (operation === 'upscale') {
 					const binaryImageUpscale = this.getNodeParameter('binaryImageUpscale', i) as boolean;
 					const scaleFactor = this.getNodeParameter('scaleFactor', i) as number;
-
+					const enhance = this.getNodeParameter('enhance', i) as boolean;
+					const replication = this.getNodeParameter('replication', i) as number;
+					const enhanceCreativity = this.getNodeParameter('enhanceCreativity', i) as number;
+					const prompt = this.getNodeParameter('prompt', i) as string;
 
 					let binaryPropertyName: string;
 					let fileName: string = 'image';
@@ -1916,11 +1979,21 @@ export class VeniceAi implements INodeType {
 						const formDataObj: IDataObject = {};
 						formDataObj.image = binaryDataBuffer; // Send the binary buffer directly
 						formDataObj.scale = scaleFactor.toString();
+						formDataObj.enhance = enhance.toString();
+						formDataObj.replication = replication.toString();
+						formDataObj.enhanceCreativity = enhanceCreativity.toString();
+						if (prompt) {
+							formDataObj.prompt = prompt;
+						}
 
 						// Debug log for upscale request
 						this.logger.debug('Upscale request formData:', {
 							scale: scaleFactor,
-							imageBufferLength: binaryDataBuffer.length
+							imageBufferLength: binaryDataBuffer.length,
+							enhance: enhance,
+							replication: replication,
+							enhanceCreativity: enhanceCreativity,
+							prompt: prompt,
 						});
 					} else {
 						throw new NodeOperationError(
@@ -1948,6 +2021,7 @@ export class VeniceAi implements INodeType {
 									contentType: mimeType,
 								},
 							},
+							...formDataObj,
 						},
 						encoding: null, // Important: This ensures the response is treated as binary
 						resolveWithFullResponse: true,
@@ -1990,7 +2064,6 @@ export class VeniceAi implements INodeType {
 						let outputFileName = fileName;
 						responseMimeType = 'image/png';
 
-
 						// Save the binary data
 						const newItem: INodeExecutionData = {
 							json: {
@@ -1998,6 +2071,10 @@ export class VeniceAi implements INodeType {
 								filename: outputFileName,
 								format: responseMimeType,
 								scale: scaleFactor,
+								enhance: enhance,
+								replication: replication,
+								enhanceCreativity: enhanceCreativity,
+								prompt: prompt,
 							},
 							binary: {
 								data: await this.helpers.prepareBinaryData(

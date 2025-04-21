@@ -189,6 +189,11 @@ Tested on n8n Version 1.71.3+
 ### v1.9.0
 - Added Base URL to credentials to be able to use various endpoints (usefull for Venice betatesters)
 
+### v1.9.1
+- Added new options to Upscale operation: Enhance, Replication, Enhance Creativity, and Prompt
+- These options allow finer control over image upscaling and creativity
+- All options are available in the node UI and sent to the Venice API
+
 ## Upcoming Features
 
 The following features are planned for future releases:
